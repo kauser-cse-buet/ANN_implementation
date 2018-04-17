@@ -53,8 +53,20 @@ end
 
 
 folds_list = zeros(epoch, 1);
+
+
+
+epoch=200;
+
+B=cell(length(L)-1,1);  % forming the number of Beta/weight matrix needed in between the layers
+for i=1:length(L)-1
+	B{i} =rand(L(i + 1), L(i) + 1)'; % populate initial weight
+end
+
+
 for i = 1: epoch
-    [ cv_test_err, cv_train_err, cv_test_precision, cv_test_recall, cv_test_f1_score, cv_train_precision, cv_train_recall, cv_train_f1_score] = cross_validate( X, Y, cv, L);
+    [ cv_test_err, cv_train_err, cv_test_precision, cv_test_recall, cv_test_f1_score, cv_train_precision, cv_train_recall, cv_train_f1_score, B_best] = cross_validate( X, Y, cv, L, B);
+    B = B_best;
     cv_test_err_list(i) = cv_test_err;
     cv_train_err_list(i) = cv_train_err;
     
@@ -67,6 +79,7 @@ for i = 1: epoch
     cv_train_f1_score_list(i, :) = cv_train_f1_score;
     
     folds_list(i) = i;
+    epoch = epoch + 1;
 end
 
 report_filename = strcat('report_nh_', int2str(n_hidden_layer), '.csv');
